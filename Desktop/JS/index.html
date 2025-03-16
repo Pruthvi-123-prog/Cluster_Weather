@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .divi{
+            background-color: rgb(94, 148, 255);
+            width: 300px;
+            height: 170px;
+            margin: 10px;
+            padding-top: 5px;
+            padding-bottom: 40px;
+            align-items: center;
+            border-radius: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            box-shadow:5px 5px 9px gray;
+        }
+
+        .textbox{
+            border-radius: 5px;
+            font-family: Arial, Helvetica, sans-serif;
+            width: 110px;
+            height: 40px;
+            background-color: rgb(198, 229, 255);
+            margin: 5px;
+        }
+
+        .butt{
+            border-radius: 5px;
+            font-family: Arial, Helvetica, sans-serif;
+            width: 118px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+    <center>
+    <div class="divi">
+        <h1 class="tex">Trial Input</h1>
+        <input type="text" class="textbox">
+        <br>
+        <button class="butt">OK</button>
+        <p class="para" style="font-family: Arial, Helvetica, sans-serif;">You Said: </p>
+    </div>
+    </center>
+
+    <script>
+        document.querySelector(".textbox").addEventListener('input', function(){
+        const input_1 = document.querySelector(".textbox").value;
+        document.querySelector(".butt").onclick = function(){
+            document.querySelector(".para").innerHTML += input_1;
+        }
+        });
+    </script>
+</body>
+</html>

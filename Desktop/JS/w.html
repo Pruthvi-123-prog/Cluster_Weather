@@ -1,0 +1,111 @@
+weather.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    // ...existing styles remain unchanged...
+</head>
+<body>
+    // ...existing HTML structure remains unchanged...
+
+    <script>
+        // Create circular texture for stars
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 32, 32);
+        const starTexture = new THREE.CanvasTexture(canvas);
+
+        // Three.js Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        scene.fog = new THREE.FogExp2(0x000000, 0.00025);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 3000; // Increased count for better effect
+        
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i += 3) {
+            // Spherical distribution
+            const radius = 50 * Math.random();
+            const theta = 2 * Math.PI * Math.random();
+            const phi = Math.acos(2 * Math.random() - 1);
+            
+            posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
+            posArray[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            posArray[i + 2] = radius * Math.cos(phi);
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.5,
+            map: starTexture,
+            transparent: true,
+            opacity: 0.8,
+            color: 0xffffff,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.z = 30;
+
+        // Mouse movement effect
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const time = Date.now() * 0.0005;
+            
+            // Rotation and movement
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            
+            // Subtle breathing effect
+            const scale = 1 + Math.sin(time) * 0.03;
+            particlesMesh.scale.set(scale, scale, scale);
+            
+            // Mouse interaction
+            particlesMesh.rotation.x += (mouseY * 0.02 - particlesMesh.rotation.x) * 0.01;
+            particlesMesh.rotation.y += (mouseX * 0.02 - particlesMesh.rotation.y) * 0.01;
+            
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // ...rest of your existing code (weather API fetch, display function, etc.) remains unchanged...
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
