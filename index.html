@@ -35,6 +35,10 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 2;
+            max-height: 90vh; /* Maximum height of 90% viewport height */
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
         }
         .weather-card {
             background: rgba(10, 25, 47, 0.8);
@@ -50,8 +54,27 @@
             overflow: hidden;
             touch-action: none;
             -webkit-tap-highlight-color: transparent;
+            max-height: calc(90vh - 40px); 
+            overflow-y: auto; 
+            scrollbar-width: thin;
+            scrollbar-color: #64ffda rgba(100, 255, 218, 0.1);
+        }
+
+        .weather-card::-webkit-scrollbar {
+            width: 8px;
         }
     
+        .weather-card::-webkit-scrollbar-track {
+            background: rgba(100, 255, 218, 0.1);
+            border-radius: 4px;
+        }
+
+        .weather-card::-webkit-scrollbar-thumb {
+            background: #64ffda;
+            border-radius: 4px;
+        }
+
+
         .weather-card::before {
             content: '';
             position: absolute;
@@ -132,6 +155,30 @@
             color: #64ffda;
             text-align: center;
             text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+        }
+
+        .user-card {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .user-card p {
+            margin: 8px 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        @media (max-height: 600px) {
+            .weather-card {
+                padding: 1rem;
+            }
+            
+            .user-card p {
+                margin: 6px 0;
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
@@ -333,26 +380,26 @@ for(let i = 0; i < particlesCount * 3; i += 3) {
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        function display(data){
+        function display(data) {
             document.querySelector(".result-text").innerHTML = `
             <div class="user-card">
-                <p><strong>City: </strong> ${data.location.name}</p>
-                <p><strong>Country: </strong> ${data.location.country}</p>
-                <p><strong>Temperature: </strong> ${data.current.temperature}°C</p>
-                <p><strong>Status: </strong> ${data.current.weather_descriptions} Day</p>
-                <p><strong>Humidity: </strong> ${data.current.humidity}%</p>
-                <p><strong>Cloud Status: </strong>
-                    ${data.current.cloudcover} Oktas
-                </p>
-                <p><strong>Wind Speed: </strong> ${data.current.wind_speed} meter/s</p>
-                <p><strong>Pressure: </strong> ${data.current.pressure} Pa</p>
+                <p><strong>City: </strong> ${data.name}</p>
+                <p><strong>Country: </strong> ${data.sys.country}</p>
+                <p><strong>Temperature: </strong> ${Math.round(data.main.temp - 273.15)}°C</p>
+                <p><strong>Feels Like: </strong> ${Math.round(data.main.feels_like - 273.15)}°C</p>
+                <p><strong>Weather: </strong> ${data.weather[0].main}</p>
+                <p><strong>Description: </strong> ${data.weather[0].description}</p>
+                <p><strong>Humidity: </strong> ${data.main.humidity}%</p>
+                <p><strong>Cloud Cover: </strong> ${data.clouds.all}%</p>
+                <p><strong>Wind Speed: </strong> ${data.wind.speed} m/s</p>
+                <p><strong>Pressure: </strong> ${data.main.pressure} hPa</p>
             </div>
             `;
         }
             async function fetchh(){
                 try{
                 const selectt = document.querySelector(".temp-input");
-                const url = await fetch(`https://api.weatherstack.com/current?access_key=ad7b244cfe01ddd5c345be2b84c26db5&query=${selectt.value}`);
+                const url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${selectt.value}&appid=d5799a3326258dbbfc1f0af2974a32c2`);
                 const data = await url.json();
                 display(data);
         }
